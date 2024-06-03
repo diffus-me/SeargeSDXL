@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from .data_utils import retrieve_input
 from .data_utils import retrieve_parameter
 from .mb_pipeline import PipelineAccess
@@ -54,7 +54,7 @@ class SeargePreProcessData:
 
         return stage_data
 
-    def process(self, data, stage_input):
+    def process(self, context: execution_context.ExecutionContext, data, stage_input):
         access = PipelineAccess(stage_input)
 
         denoise = access.get_active_setting(UI.S_IMG2IMG_INPAINTING, UI.F_DENOISE, 0.5)

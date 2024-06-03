@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 import folder_paths
 
 from .data_utils import retrieve_parameter
@@ -52,7 +52,7 @@ class SeargeStageLoadCheckpoints:
 
         return stage_data
 
-    def process(self, data, stage_input):
+    def process(self, context: execution_context.ExecutionContext, data, stage_input):
         access = PipelineAccess(stage_input)
 
         # TODO: this stage will always execute, even if the pipeline is disabled and in that case unload all models
@@ -116,7 +116,7 @@ class SeargeStageLoadCheckpoints:
         if base_changed:
             base_name = access.get_active_setting(UI.S_CHECKPOINTS, UI.F_BASE_CHECKPOINT)
 
-            if folder_paths.get_full_path("checkpoints", base_name) is None:
+            if folder_paths.get_full_path(context, "checkpoints", base_name) is None:
                 base_checkpoint = (None, None, None)
             else:
                 base_checkpoint = NodeWrapper.checkpoint_loader.load_checkpoint(base_name)
@@ -147,7 +147,7 @@ class SeargeStageLoadCheckpoints:
         if refiner_changed:
             refiner_name = access.get_active_setting(UI.S_CHECKPOINTS, UI.F_REFINER_CHECKPOINT, UI.NONE)
 
-            if refiner_name == UI.NONE or folder_paths.get_full_path("checkpoints", refiner_name) is None:
+            if refiner_name == UI.NONE or folder_paths.get_full_path(context, "checkpoints", refiner_name) is None:
                 refiner_checkpoint = (None, None, None,)
             else:
                 refiner_checkpoint = NodeWrapper.checkpoint_loader.load_checkpoint(refiner_name)
@@ -179,7 +179,7 @@ class SeargeStageLoadCheckpoints:
             vae_name = access.get_active_setting(UI.S_CHECKPOINTS, UI.F_VAE_CHECKPOINT, UI.VAE_FROM_BASE_MODEL)
 
             if vae_name == UI.VAE_FROM_REFINER_MODEL:
-                if refiner_vae is not None and folder_paths.get_full_path("vae", vae_name) is not None:
+                if refiner_vae is not None and folder_paths.get_full_path(context, "vae", vae_name) is not None:
                     vae_checkpoint = refiner_vae
                 else:
                     vae_checkpoint = base_vae
@@ -202,7 +202,7 @@ class SeargeStageLoadCheckpoints:
         if hires_upscaler_changed:
             hires_name = access.get_active_setting(UI.S_UPSCALE_MODELS, UI.F_HIGH_RES_UPSCALER, UI.NONE)
 
-            if hires_name != UI.NONE and folder_paths.get_full_path("upscale_models", hires_name) is not None:
+            if hires_name != UI.NONE and folder_paths.get_full_path(context, "upscale_models", hires_name) is not None:
                 hires_upscaler_model = NodeWrapper.upscale_loader.load_model(hires_name)[0]
             else:
                 hires_upscaler_model = None
@@ -219,7 +219,7 @@ class SeargeStageLoadCheckpoints:
         if primary_upscaler_changed:
             primary_name = access.get_active_setting(UI.S_UPSCALE_MODELS, UI.F_PRIMARY_UPSCALER, UI.NONE)
 
-            if primary_name != UI.NONE and folder_paths.get_full_path("upscale_models", primary_name) is not None:
+            if primary_name != UI.NONE and folder_paths.get_full_path(context, "upscale_models", primary_name) is not None:
                 primary_upscaler_model = NodeWrapper.upscale_loader.load_model(primary_name)[0]
             else:
                 primary_upscaler_model = None
@@ -236,7 +236,7 @@ class SeargeStageLoadCheckpoints:
         if secondary_upscaler_changed:
             secondary_name = access.get_active_setting(UI.S_UPSCALE_MODELS, UI.F_SECONDARY_UPSCALER, UI.NONE)
 
-            if secondary_name != UI.NONE and folder_paths.get_full_path("upscale_models", secondary_name) is not None:
+            if secondary_name != UI.NONE and folder_paths.get_full_path(context, "upscale_models", secondary_name) is not None:
                 secondary_upscaler_model = NodeWrapper.upscale_loader.load_model(secondary_name)[0]
             else:
                 secondary_upscaler_model = None
@@ -253,7 +253,7 @@ class SeargeStageLoadCheckpoints:
         if detail_processor_changed:
             detailer_name = access.get_active_setting(UI.S_UPSCALE_MODELS, UI.F_DETAIL_PROCESSOR, UI.NONE)
 
-            if detailer_name != UI.NONE and folder_paths.get_full_path("upscale_models", detailer_name) is not None:
+            if detailer_name != UI.NONE and folder_paths.get_full_path(context, "upscale_models", detailer_name) is not None:
                 detail_processor_model = NodeWrapper.upscale_loader.load_model(detailer_name)[0]
             else:
                 detail_processor_model = None
@@ -270,7 +270,7 @@ class SeargeStageLoadCheckpoints:
         if clip_vision_checkpoint_changed:
             clipvision_name = access.get_active_setting(UI.S_CONTROLNET_MODELS, UI.F_CLIP_VISION_CHECKPOINT, UI.NONE)
 
-            if clipvision_name != UI.NONE and folder_paths.get_full_path("clip_vision", clipvision_name) is not None:
+            if clipvision_name != UI.NONE and folder_paths.get_full_path(context, "clip_vision", clipvision_name) is not None:
                 clip_vision_model = NodeWrapper.clipvision_loader.load_clip(clipvision_name)[0]
             else:
                 clip_vision_model = None
@@ -287,7 +287,7 @@ class SeargeStageLoadCheckpoints:
         if canny_checkpoint_changed:
             canny_name = access.get_active_setting(UI.S_CONTROLNET_MODELS, UI.F_CANNY_CHECKPOINT, UI.NONE)
 
-            if canny_name != UI.NONE and folder_paths.get_full_path("controlnet", canny_name) is not None:
+            if canny_name != UI.NONE and folder_paths.get_full_path(context, "controlnet", canny_name) is not None:
                 canny_model = NodeWrapper.controlnet_loader.load_controlnet(canny_name)[0]
             else:
                 canny_model = None
@@ -304,7 +304,7 @@ class SeargeStageLoadCheckpoints:
         if depth_checkpoint_changed:
             depth_name = access.get_active_setting(UI.S_CONTROLNET_MODELS, UI.F_DEPTH_CHECKPOINT, UI.NONE)
 
-            if depth_name != UI.NONE and folder_paths.get_full_path("controlnet", depth_name) is not None:
+            if depth_name != UI.NONE and folder_paths.get_full_path(context, "controlnet", depth_name) is not None:
                 depth_model = NodeWrapper.controlnet_loader.load_controlnet(depth_name)[0]
             else:
                 depth_model = None
@@ -321,7 +321,7 @@ class SeargeStageLoadCheckpoints:
         if recolor_checkpoint_changed:
             recolor_name = access.get_active_setting(UI.S_CONTROLNET_MODELS, UI.F_RECOLOR_CHECKPOINT, UI.NONE)
 
-            if recolor_name != UI.NONE and folder_paths.get_full_path("controlnet", recolor_name) is not None:
+            if recolor_name != UI.NONE and folder_paths.get_full_path(context, "controlnet", recolor_name) is not None:
                 recolor_model = NodeWrapper.controlnet_loader.load_controlnet(recolor_name)[0]
             else:
                 recolor_model = None
@@ -338,7 +338,7 @@ class SeargeStageLoadCheckpoints:
         if sketch_checkpoint_changed:
             sketch_name = access.get_active_setting(UI.S_CONTROLNET_MODELS, UI.F_SKETCH_CHECKPOINT, UI.NONE)
 
-            if sketch_name != UI.NONE and folder_paths.get_full_path("controlnet", sketch_name) is not None:
+            if sketch_name != UI.NONE and folder_paths.get_full_path(context, "controlnet", sketch_name) is not None:
                 sketch_model = NodeWrapper.controlnet_loader.load_controlnet(sketch_name)[0]
             else:
                 sketch_model = None
@@ -355,7 +355,7 @@ class SeargeStageLoadCheckpoints:
         if custom_checkpoint_changed:
             custom_name = access.get_active_setting(UI.S_CONTROLNET_MODELS, UI.F_CUSTOM_CHECKPOINT, UI.NONE)
 
-            if custom_name != UI.NONE and folder_paths.get_full_path("controlnet", custom_name) is not None:
+            if custom_name != UI.NONE and folder_paths.get_full_path(context, "controlnet", custom_name) is not None:
                 custom_model = NodeWrapper.controlnet_loader.load_controlnet(custom_name)[0]
             else:
                 custom_model = None

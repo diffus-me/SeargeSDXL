@@ -31,6 +31,7 @@ import datetime
 import comfy.samplers
 import comfy_extras.nodes_upscale_model
 import comfy_extras.nodes_post_processing
+import execution_context
 import folder_paths
 import json
 import nodes
@@ -499,6 +500,9 @@ class SeargeParameterProcessor:
         return {"required": {
             "inputs": ("PARAMETER_INPUTS",),
         },
+        "hidden": {
+            "context": "EXECUTION_CONTEXT"
+        }
         }
 
     RETURN_TYPES = ("PARAMETERS",)
@@ -507,7 +511,7 @@ class SeargeParameterProcessor:
 
     CATEGORY = "Searge/_deprecated_/UI"
 
-    def process(self, inputs):
+    def process(self, context: execution_context.ExecutionContext, inputs):
         if inputs is None:
             parameters = {}
         else:
@@ -666,6 +670,9 @@ class SeargeStylePreprocessor:
             "active_style_name": ("STRING", {"multiline": False, "default": ""}),
             "style_definitions": ("STRING", {"multiline": True, "default": "[unfinished work in progress]"}),
         },
+        "hidden": {
+            "context": "EXECUTION_CONTEXT"
+        }
         }
 
     RETURN_TYPES = ("PARAMETER_INPUTS",)
@@ -674,7 +681,7 @@ class SeargeStylePreprocessor:
 
     CATEGORY = "Searge/_deprecated_/UI"
 
-    def process(self, inputs, active_style_name, style_definitions):
+    def process(self, context: execution_context.ExecutionContext, inputs, active_style_name, style_definitions):
         if inputs is None:
             inputs = {}
 
@@ -840,14 +847,14 @@ class SeargeInput3:
 
 class SeargeInput4:
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(s, context: execution_context.ExecutionContext):
         return {"required": {
-            "base_model": (folder_paths.get_filename_list("checkpoints"),),
-            "refiner_model": (folder_paths.get_filename_list("checkpoints"),),
-            "vae_model": (folder_paths.get_filename_list("vae"),),
-            "main_upscale_model": (folder_paths.get_filename_list("upscale_models"),),
-            "support_upscale_model": (folder_paths.get_filename_list("upscale_models"),),
-            "lora_model": (folder_paths.get_filename_list("loras"),),
+            "base_model": (folder_paths.get_filename_list(context, "checkpoints"),),
+            "refiner_model": (folder_paths.get_filename_list(context, "checkpoints"),),
+            "vae_model": (folder_paths.get_filename_list(context, "vae"),),
+            "main_upscale_model": (folder_paths.get_filename_list(context, "upscale_models"),),
+            "support_upscale_model": (folder_paths.get_filename_list(context, "upscale_models"),),
+            "lora_model": (folder_paths.get_filename_list(context, "loras"),),
         },
             "optional": {
                 "model_settings": ("MODEL_SETTINGS",),

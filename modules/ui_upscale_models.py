@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from .ui import UI
 
 
@@ -35,13 +35,13 @@ from .ui import UI
 
 class SeargeUpscaleModels:
     @classmethod
-    def INPUT_TYPES(cls):
+    def INPUT_TYPES(cls, context: execution_context.ExecutionContext):
         return {
             "required": {
-                "detail_processor": (UI.UPSCALERS_1x_WITH_NONE(),),
-                "high_res_upscaler": (UI.UPSCALERS_4x_WITH_NONE(),),
-                "primary_upscaler": (UI.UPSCALERS_4x_WITH_NONE(),),
-                "secondary_upscaler": (UI.UPSCALERS_4x_WITH_NONE(),),
+                "detail_processor": (UI.UPSCALERS_1x_WITH_NONE(context),),
+                "high_res_upscaler": (UI.UPSCALERS_4x_WITH_NONE(context),),
+                "primary_upscaler": (UI.UPSCALERS_4x_WITH_NONE(context),),
+                "secondary_upscaler": (UI.UPSCALERS_4x_WITH_NONE(context),),
             },
             "optional": {
                 "data": ("SRG_DATA_STREAM",),

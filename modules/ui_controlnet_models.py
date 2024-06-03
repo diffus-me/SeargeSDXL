@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from .ui import UI
 
 
@@ -35,15 +35,15 @@ from .ui import UI
 
 class SeargeControlnetModels:
     @classmethod
-    def INPUT_TYPES(cls):
+    def INPUT_TYPES(cls, context: execution_context.ExecutionContext):
         return {
             "required": {
-                "clip_vision": (UI.CLIP_VISION_WITH_NONE(),),
-                "canny_checkpoint": (UI.CONTROLNETS_WITH_NONE(),),
-                "depth_checkpoint": (UI.CONTROLNETS_WITH_NONE(),),
-                "recolor_checkpoint": (UI.CONTROLNETS_WITH_NONE(),),
-                "sketch_checkpoint": (UI.CONTROLNETS_WITH_NONE(),),
-                "custom_checkpoint": (UI.CONTROLNETS_WITH_NONE(),),
+                "clip_vision": (UI.CLIP_VISION_WITH_NONE(context),),
+                "canny_checkpoint": (UI.CONTROLNETS_WITH_NONE(context),),
+                "depth_checkpoint": (UI.CONTROLNETS_WITH_NONE(context),),
+                "recolor_checkpoint": (UI.CONTROLNETS_WITH_NONE(context),),
+                "sketch_checkpoint": (UI.CONTROLNETS_WITH_NONE(context),),
+                "custom_checkpoint": (UI.CONTROLNETS_WITH_NONE(context),),
             },
             "optional": {
                 "data": ("SRG_DATA_STREAM",),

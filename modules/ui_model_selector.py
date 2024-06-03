@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from .ui import UI
 
 
@@ -35,12 +35,12 @@ from .ui import UI
 
 class SeargeModelSelector:
     @classmethod
-    def INPUT_TYPES(cls):
+    def INPUT_TYPES(cls, context: execution_context.ExecutionContext):
         return {
             "required": {
-                "base_checkpoint": (UI.CHECKPOINTS(),),
-                "refiner_checkpoint": (UI.CHECKPOINTS_WITH_NONE(),),
-                "vae_checkpoint": (UI.VAE_WITH_EMBEDDED(),),
+                "base_checkpoint": (UI.CHECKPOINTS(context),),
+                "refiner_checkpoint": (UI.CHECKPOINTS_WITH_NONE(context),),
+                "vae_checkpoint": (UI.VAE_WITH_EMBEDDED(context),),
             },
             "optional": {
                 "data": ("SRG_DATA_STREAM",),

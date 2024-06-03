@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 import folder_paths
 import nodes
 
@@ -306,40 +306,40 @@ class UI:
     # ================================================================================
 
     @staticmethod
-    def CHECKPOINTS():
-        return folder_paths.get_filename_list("checkpoints")
+    def CHECKPOINTS(context: execution_context.ExecutionContext):
+        return folder_paths.get_filename_list(context, "checkpoints")
 
     @staticmethod
-    def CHECKPOINTS_WITH_NONE():
-        return [UI.NONE] + folder_paths.get_filename_list("checkpoints")
+    def CHECKPOINTS_WITH_NONE(context: execution_context.ExecutionContext):
+        return [UI.NONE] + folder_paths.get_filename_list(context, "checkpoints")
 
     @staticmethod
-    def VAE_WITH_EMBEDDED():
-        return UI.VAE_SOURCES + folder_paths.get_filename_list("vae")
+    def VAE_WITH_EMBEDDED(context: execution_context.ExecutionContext):
+        return UI.VAE_SOURCES + folder_paths.get_filename_list(context, "vae")
 
     @staticmethod
-    def UPSCALERS_WITH_NONE():
-        return [UI.NONE] + folder_paths.get_filename_list("upscale_models")
+    def UPSCALERS_WITH_NONE(context: execution_context.ExecutionContext):
+        return [UI.NONE] + folder_paths.get_filename_list(context, "upscale_models")
 
     @staticmethod
-    def UPSCALERS_1x_WITH_NONE():
-        return [UI.NONE] + [fn for fn in folder_paths.get_filename_list("upscale_models") if fn.startswith("1x")]
+    def UPSCALERS_1x_WITH_NONE(context: execution_context.ExecutionContext):
+        return [UI.NONE] + [fn for fn in folder_paths.get_filename_list(context, "upscale_models") if fn.startswith("1x")]
 
     @staticmethod
-    def UPSCALERS_4x_WITH_NONE():
-        return [UI.NONE] + [fn for fn in folder_paths.get_filename_list("upscale_models") if fn.startswith("4x")]
+    def UPSCALERS_4x_WITH_NONE(context: execution_context.ExecutionContext):
+        return [UI.NONE] + [fn for fn in folder_paths.get_filename_list(context, "upscale_models") if fn.startswith("4x")]
 
     @staticmethod
-    def LORAS_WITH_NONE():
-        return [UI.NONE] + folder_paths.get_filename_list("loras")
+    def LORAS_WITH_NONE(context: execution_context.ExecutionContext):
+        return [UI.NONE] + folder_paths.get_filename_list(context, "loras")
 
     @staticmethod
-    def CONTROLNETS_WITH_NONE():
-        return [UI.NONE] + folder_paths.get_filename_list("controlnet")
+    def CONTROLNETS_WITH_NONE(context: execution_context.ExecutionContext):
+        return [UI.NONE] + folder_paths.get_filename_list(context, "controlnet")
 
     @staticmethod
-    def CLIP_VISION_WITH_NONE():
-        return [UI.NONE] + folder_paths.get_filename_list("clip_vision")
+    def CLIP_VISION_WITH_NONE(context: execution_context.ExecutionContext):
+        return [UI.NONE] + folder_paths.get_filename_list(context, "clip_vision")
 
     # ================================================================================
     # PROCESSING

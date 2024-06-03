@@ -34,6 +34,7 @@ from datetime import datetime
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
+import execution_context
 import folder_paths
 
 from .data_utils import retrieve_parameter
@@ -59,7 +60,7 @@ class SeargeStageImageSaving:
 
         return stage_data
 
-    def process(self, data, stage_input, user_hash):
+    def process(self, context: execution_context.ExecutionContext, data, stage_input, user_hash):
         access = PipelineAccess(stage_input)
 
         save_parameters_file = access.get_active_setting(UI.S_IMAGE_SAVING, UI.F_SAVE_PARAMETERS_FILE, False)

@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from ._experimental import gaussian_latent_noise
 from .data_utils import retrieve_parameter
 from .mb_pipeline import PipelineAccess
@@ -53,7 +53,7 @@ class SeargeStageLatentInputs:
 
         return stage_data
 
-    def process(self, data, stage_input):
+    def process(self, context: execution_context.ExecutionContext, data, stage_input):
         access = PipelineAccess(stage_input)
 
         vae_changed = access.changed_in_pipeline(Names.P_VAE_MODEL)

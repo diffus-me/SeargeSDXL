@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from .data_utils import retrieve_parameter
 from .mb_pipeline import PipelineAccess
 from .names import Names
@@ -50,7 +50,7 @@ class SeargeStageApplyControlnet:
 
         return stage_data
 
-    def process(self, data, stage_input):
+    def process(self, context: execution_context.ExecutionContext, data, stage_input):
         access = PipelineAccess(stage_input)
 
         stack = access.get_active_setting(UI.S_CONTROLNET_INPUTS, UI.F_CN_STACK, [])

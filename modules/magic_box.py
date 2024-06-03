@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from .mb_pipeline import PipelineAccess
 from .stage import SeargeStage
 from .stage_pre_processing import SeargePreProcessData
@@ -128,6 +128,9 @@ class SeargeMagicBox:
                 "data": ("SRG_DATA_STREAM",),
                 "custom_input": ("SRG_STAGE_INPUT",),
             },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
+            }
         }
 
     RETURN_TYPES = ("SRG_DATA_STREAM", "SRG_STAGE_OUTPUT",)
@@ -136,7 +139,7 @@ class SeargeMagicBox:
 
     CATEGORY = UI.CATEGORY_MAGIC
 
-    def run_stage(self, stage, data, stage_input=None):
+    def run_stage(self, stage, data, stage_input=None, context: execution_context.ExecutionContext = None):
         stage_processor = None
 
         has_data = data is not None
@@ -245,7 +248,7 @@ class SeargeMagicBox:
         # process the selected stage
         stage_result = None
         if stage_input is not None:
-            (data, stage_result) = stage_processor.process(data, stage_input)
+            (data, stage_result) = stage_processor.process(context, data, stage_input)
 
         # if we got a result from this stage, put it on the data stream
         if has_data:

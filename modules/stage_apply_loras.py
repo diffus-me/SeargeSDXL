@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 import folder_paths
 
 from .data_utils import retrieve_parameter
@@ -52,7 +52,7 @@ class SeargeStageApplyLoras:
 
         return stage_data
 
-    def process(self, data, stage_input):
+    def process(self, context: execution_context.ExecutionContext, data, stage_input):
         access = PipelineAccess(stage_input)
 
         base_model = access.get_from_pipeline(Names.P_BASE_MODEL)
@@ -76,7 +76,7 @@ class SeargeStageApplyLoras:
                 lora_name = retrieve_parameter(UI.F_LORA_NAME, lora)
                 lora_strength = retrieve_parameter(UI.F_LORA_STRENGTH, lora, 0.0)
 
-                if folder_paths.get_full_path("loras", lora_name) is None or base_model is None or base_clip is None:
+                if folder_paths.get_full_path(context, "loras", lora_name) is None or base_model is None or base_clip is None:
                     lora_name = None
 
                 if lora_name is not None and lora_name != UI.NONE and lora_strength != 0.0:

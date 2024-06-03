@@ -47,8 +47,8 @@ class SeargeControlnetAdapterV2:
         self.hed_annotator = "ControlNetHED.pth"
         self.leres_annotator = "res101.pth"
 
-        self.hed_annotator_full_path = get_full_path("annotators", self.hed_annotator)
-        self.leres_annotator_full_path = get_full_path("annotators", self.leres_annotator)
+        self.hed_annotator_full_path = get_full_path(None, "annotators", self.hed_annotator)
+        self.leres_annotator_full_path = get_full_path(None, "annotators", self.leres_annotator)
 
     @classmethod
     def INPUT_TYPES(s):

@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from .data_utils import retrieve_parameter
 from .ui import UI
 
@@ -39,18 +39,18 @@ class SeargeLoras:
         self.expected_lora_stack_size = None
 
     @classmethod
-    def INPUT_TYPES(cls):
+    def INPUT_TYPES(cls, context: execution_context.ExecutionContext):
         return {
             "required": {
-                "lora_1": (UI.LORAS_WITH_NONE(),),
+                "lora_1": (UI.LORAS_WITH_NONE(context),),
                 "lora_1_strength": ("FLOAT", {"default": 0.0, "min": -10.0, "max": 10.0, "step": 0.05},),
-                "lora_2": (UI.LORAS_WITH_NONE(),),
+                "lora_2": (UI.LORAS_WITH_NONE(context),),
                 "lora_2_strength": ("FLOAT", {"default": 0.0, "min": -10.0, "max": 10.0, "step": 0.05},),
-                "lora_3": (UI.LORAS_WITH_NONE(),),
+                "lora_3": (UI.LORAS_WITH_NONE(context),),
                 "lora_3_strength": ("FLOAT", {"default": 0.0, "min": -10.0, "max": 10.0, "step": 0.05},),
-                "lora_4": (UI.LORAS_WITH_NONE(),),
+                "lora_4": (UI.LORAS_WITH_NONE(context),),
                 "lora_4_strength": ("FLOAT", {"default": 0.0, "min": -10.0, "max": 10.0, "step": 0.05},),
-                "lora_5": (UI.LORAS_WITH_NONE(),),
+                "lora_5": (UI.LORAS_WITH_NONE(context),),
                 "lora_5_strength": ("FLOAT", {"default": 0.0, "min": -10.0, "max": 10.0, "step": 0.05},),
             },
             "optional": {
