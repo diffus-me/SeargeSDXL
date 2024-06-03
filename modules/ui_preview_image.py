@@ -41,7 +41,6 @@ from .ui import UI
 class SeargePreviewImage(nodes.SaveImage):
     def __init__(self):
         super().__init__()
-        self.output_dir = folder_paths.get_temp_directory()
         self.type = "temp"
         self.prefix_append = "_temp_" + ''.join(random.choice("abcdefghijklmnopqrstupvxyz") for _ in range(5))
 
@@ -57,6 +56,7 @@ class SeargePreviewImage(nodes.SaveImage):
             "hidden": {
                 "prompt": "PROMPT",
                 "extra_pnginfo": "EXTRA_PNGINFO",
+                "user_hash": "USER_HASH"
             },
         }
 
@@ -66,14 +66,14 @@ class SeargePreviewImage(nodes.SaveImage):
 
     CATEGORY = UI.CATEGORY_UI
 
-    def preview_images(self, enabled, images=None, prompt=None, extra_pnginfo=None):
+    def preview_images(self, enabled, images=None, prompt=None, extra_pnginfo=None, user_hash=''):
         if images is None or not enabled:
             return {
                 "result": (images,),
                 "ui": {"images": list(), },
             }
 
-        saved_images = nodes.SaveImage.save_images(self, images, "srg_sdxl_preview", prompt, extra_pnginfo)
+        saved_images = nodes.SaveImage.save_images(self, images, "srg_sdxl_preview", prompt, extra_pnginfo, user_hash)
         saved_images["result"] = (images,)
 
         return saved_images

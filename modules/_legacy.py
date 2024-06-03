@@ -1761,7 +1761,7 @@ class SeargeImageSave:
                 "save_to": ("SAVE_FOLDER", {"default": SeargeParameterProcessor.SAVE_TO[0]}),
             },
             "hidden": {
-                "prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"
+                "prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "user_hash": "USER_HASH"
             },
         }
 
@@ -1772,18 +1772,18 @@ class SeargeImageSave:
 
     CATEGORY = "Searge/_deprecated_/Files"
 
-    def save_images(self, images, filename_prefix, state, save_to, prompt=None, extra_pnginfo=None):
+    def save_images(self, images, filename_prefix, state, save_to, prompt=None, extra_pnginfo=None, user_hash=''):
         # "disabled"
         if state == SeargeParameterProcessor.STATES[0]:
             return {}
 
         # "input folder"
         if save_to == SeargeParameterProcessor.SAVE_TO[1]:
-            output_dir = folder_paths.get_input_directory()
+            output_dir = folder_paths.get_input_directory(user_hash)
             filename_prefix = "output-%date%"
         # incl. SeargeParameterProcessor.SAVE_TO[0] -> "output folder"
         else:
-            output_dir = folder_paths.get_output_directory()
+            output_dir = folder_paths.get_output_directory(user_hash)
 
         filename_prefix = filename_prefix.replace("%date%", datetime.now().strftime("%Y-%m-%d"))
 
