@@ -72,7 +72,7 @@ class NodeWrapper:
     zero_out_cond = nodes.ConditioningZeroOut()
 
     @staticmethod
-    def sdxl_sampler(base_model, base_positive, base_negative, latent_image, noise_seed, steps, cfg,
+    def sdxl_sampler(context, base_model, base_positive, base_negative, latent_image, noise_seed, steps, cfg,
                      sampler_name, scheduler, refiner_model=None, refiner_positive=None, refiner_negative=None,
                      base_ratio=0.8, denoise=1.0, cfg_method=None, dynamic_base_cfg=0.0, dynamic_refiner_cfg=0.0,
                      refiner_detail_boost=0.0):
@@ -91,12 +91,12 @@ class NodeWrapper:
             return latent_image
 
         if refiner_steps == 0 or not has_refiner_model:
-            result = sdxl_ksampler(base_model, None, noise_seed, base_steps, 0, cfg, sampler_name,
+            result = sdxl_ksampler(context, base_model, None, noise_seed, base_steps, 0, cfg, sampler_name,
                                    scheduler, base_positive, base_negative, None, None,
                                    latent_image, denoise=denoise, disable_noise=False, start_step=0, last_step=steps,
                                    force_full_denoise=True, dynamic_base_cfg=dynamic_base_cfg, cfg_method=cfg_method)
         else:
-            result = sdxl_ksampler(base_model, refiner_model, noise_seed, base_steps, refiner_steps, cfg, sampler_name,
+            result = sdxl_ksampler(context, base_model, refiner_model, noise_seed, base_steps, refiner_steps, cfg, sampler_name,
                                    scheduler, base_positive, base_negative, refiner_positive, refiner_negative,
                                    latent_image, denoise=denoise, disable_noise=False,
                                    start_step=0, last_step=steps, force_full_denoise=True,
@@ -106,9 +106,9 @@ class NodeWrapper:
         return result[0]
 
     @staticmethod
-    def common_sampler(model, seed, steps, cfg, sampler_name, scheduler, positive, negative, latent,
+    def common_sampler(context, model, seed, steps, cfg, sampler_name, scheduler, positive, negative, latent,
                        denoise=1.0, disable_noise=False, start_step=None, last_step=None, force_full_denoise=False):
-        result = nodes.common_ksampler(model, seed, steps, cfg, sampler_name, scheduler, positive, negative,
+        result = nodes.common_ksampler(context, model, seed, steps, cfg, sampler_name, scheduler, positive, negative,
                                        latent, denoise=denoise, disable_noise=disable_noise, start_step=start_step,
                                        last_step=last_step, force_full_denoise=force_full_denoise)
 

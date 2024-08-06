@@ -86,13 +86,13 @@ class SeargeStageHiresDetailer:
         sampled_changed = access.changed_in_cache(Names.C_HIRES_DETAILER, parameters)
         if any_changes or sampled_changed:
             if hires_detailer == UI.DETAILER_NORMAL and hires_mode != UI.NONE:
-                latent = self.detailer(latent, 5, "nearest-exact", base_model, base_positive, base_negative, seed, cfg)
+                latent = self.detailer(context, latent, 5, "nearest-exact", base_model, base_positive, base_negative, seed, cfg)
             elif hires_detailer == UI.DETAILER_SOFT and hires_mode != UI.NONE:
-                latent = self.detailer(latent, 5, "bicubic", base_model, base_positive, base_negative, seed, cfg)
+                latent = self.detailer(context, latent, 5, "bicubic", base_model, base_positive, base_negative, seed, cfg)
             elif hires_detailer == UI.DETAILER_BLURRY and hires_mode != UI.NONE:
-                latent = self.detailer(latent, 10, "nearest-exact", base_model, base_positive, base_negative, seed, cfg)
+                latent = self.detailer(context, latent, 10, "nearest-exact", base_model, base_positive, base_negative, seed, cfg)
             elif hires_detailer == UI.DETAILER_SOFT_BLURRY and hires_mode != UI.NONE:
-                latent = self.detailer(latent, 10, "bicubic", base_model, base_positive, base_negative, seed, cfg)
+                latent = self.detailer(context, latent, 10, "bicubic", base_model, base_positive, base_negative, seed, cfg)
 
             access.update_in_cache(Names.C_HIRES_DETAILER, parameters, latent)
             access.update_in_pipeline(Names.P_LATENT, latent)
@@ -113,7 +113,7 @@ class SeargeStageHiresDetailer:
 
         return (data, stage_output,)
 
-    def detailer(self, latent, percent, method, base_model, base_positive, base_negative, seed, cfg):
+    def detailer(self, context, latent, percent, method, base_model, base_positive, base_negative, seed, cfg):
         sampler = NodeWrapper.common_sampler
         scaler = NodeWrapper.latent_upscale_by
 
@@ -122,14 +122,14 @@ class SeargeStageHiresDetailer:
 
         latent = scaler.upscale(latent, method, 2.0)[0]
 
-        latent = sampler(base_model, seed, 100, cfg, sampler_name, scheduler,
+        latent = sampler(context, base_model, seed, 100, cfg, sampler_name, scheduler,
                          base_positive, base_negative, latent, denoise=1.0, disable_noise=False,
                          start_step=int(100 - percent * 2), last_step=int(100 - percent),
                          force_full_denoise=False)
 
         latent = scaler.upscale(latent, method, 0.5)[0]
 
-        latent = sampler(base_model, seed, 100, cfg, sampler_name, scheduler,
+        latent = sampler(context, base_model, seed, 100, cfg, sampler_name, scheduler,
                          base_positive, base_negative, latent, denoise=1.0, disable_noise=True,
                          start_step=int(100 - percent * 2), last_step=100,
                          force_full_denoise=True)

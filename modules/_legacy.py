@@ -70,6 +70,9 @@ class SeargeSDXLSampler:
             "base_ratio": ("FLOAT", {"default": 0.8, "min": 0.0, "max": 1.0, "step": 0.01}),
             "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
         },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
+            }
         }
 
     RETURN_TYPES = ("LATENT",)
@@ -79,7 +82,8 @@ class SeargeSDXLSampler:
     CATEGORY = "Searge/_deprecated_/Sampling"
 
     def sample(self, base_model, base_positive, base_negative, refiner_model, refiner_positive, refiner_negative,
-               latent_image, noise_seed, steps, cfg, sampler_name, scheduler, base_ratio, denoise):
+               latent_image, noise_seed, steps, cfg, sampler_name, scheduler, base_ratio, denoise,
+               context: execution_context.ExecutionContext):
 
         base_steps = int(steps * base_ratio)
 
@@ -87,15 +91,15 @@ class SeargeSDXLSampler:
             return (latent_image,)
 
         if base_steps >= steps:
-            return nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
+            return nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
                                          base_negative, latent_image, denoise=denoise, disable_noise=False,
                                          start_step=0, last_step=steps, force_full_denoise=True)
 
-        base_result = nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
+        base_result = nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
                                             base_negative, latent_image, denoise=denoise, disable_noise=False,
                                             start_step=0, last_step=base_steps, force_full_denoise=False)
 
-        return nodes.common_ksampler(refiner_model, noise_seed, steps, cfg, sampler_name, scheduler, refiner_positive,
+        return nodes.common_ksampler(context, refiner_model, noise_seed, steps, cfg, sampler_name, scheduler, refiner_positive,
                                      refiner_negative, base_result[0], denoise=1.0, disable_noise=True,
                                      start_step=base_steps, last_step=steps, force_full_denoise=True)
 
@@ -126,6 +130,9 @@ class SeargeSDXLSamplerV3:
             "optional": {
                 "refiner_prep_steps": ("INT", {"default": 0, "min": 0, "max": 10}),
             },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
+            }
         }
 
     RETURN_TYPES = ("LATENT",)
@@ -135,7 +142,8 @@ class SeargeSDXLSamplerV3:
 
     def sample(self, base_model, base_positive, base_negative, refiner_model, refiner_positive, refiner_negative,
                latent_image, noise_seed, steps, cfg, sampler_name, scheduler, base_ratio, denoise,
-               refiner_prep_steps=None):
+               refiner_prep_steps=None,
+               context: execution_context.ExecutionContext = None):
 
         base_steps = int(steps * (base_ratio + 0.0001))
         refiner_steps = max(0, steps - base_steps)
@@ -152,7 +160,7 @@ class SeargeSDXLSamplerV3:
 
             if refiner_prep_steps > 0:
                 start_at_step = refiner_prep_steps
-                precondition_result = nodes.common_ksampler(refiner_model, noise_seed + 2, steps, cfg, sampler_name,
+                precondition_result = nodes.common_ksampler(context, refiner_model, noise_seed + 2, steps, cfg, sampler_name,
                                                             scheduler, refiner_positive, refiner_negative,
                                                             latent_image, denoise=denoise, disable_noise=False,
                                                             start_step=steps - refiner_prep_steps, last_step=steps,
@@ -161,11 +169,11 @@ class SeargeSDXLSamplerV3:
                 input_latent = precondition_result[0]
 
         if base_steps >= steps:
-            return nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
+            return nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
                                          base_negative, input_latent, denoise=denoise, disable_noise=False,
                                          start_step=start_at_step, last_step=steps, force_full_denoise=True)
 
-        return sdxl_ksampler(base_model, refiner_model, noise_seed, base_steps, refiner_steps, cfg, sampler_name,
+        return sdxl_ksampler(context, base_model, refiner_model, noise_seed, base_steps, refiner_steps, cfg, sampler_name,
                              scheduler, base_positive, base_negative, refiner_positive, refiner_negative, input_latent,
                              denoise=denoise, disable_noise=False, start_step=start_at_step, last_step=steps,
                              force_full_denoise=True)
@@ -203,6 +211,9 @@ class SeargeSDXLImage2ImageSampler:
                 "refiner_strength": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 1.0, "step": 0.05}),
                 "softness": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.05}),
             },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
+            }
         }
 
     RETURN_TYPES = ("IMAGE",)
@@ -212,7 +223,8 @@ class SeargeSDXLImage2ImageSampler:
 
     def sample(self, base_model, base_positive, base_negative, refiner_model, refiner_positive, refiner_negative,
                image, vae, noise_seed, steps, cfg, sampler_name, scheduler, base_ratio, denoise, softness,
-               upscale_model=None, scaled_width=None, scaled_height=None, noise_offset=None, refiner_strength=None):
+               upscale_model=None, scaled_width=None, scaled_height=None, noise_offset=None, refiner_strength=None,
+               context: execution_context.ExecutionContext = None):
 
         base_steps = int(steps * (base_ratio + 0.0001))
 
@@ -259,17 +271,17 @@ class SeargeSDXLImage2ImageSampler:
         input_latent = vae_encode_result[0]
 
         if base_steps >= steps:
-            result_latent = nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler,
+            result_latent = nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler,
                                                   base_positive, base_negative, input_latent, denoise=denoise,
                                                   disable_noise=False, start_step=0, last_step=steps,
                                                   force_full_denoise=True)
         else:
-            base_result = nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler,
+            base_result = nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler,
                                                 base_positive, base_negative, input_latent, denoise=denoise,
                                                 disable_noise=False, start_step=0, last_step=base_steps,
                                                 force_full_denoise=True)
 
-            result_latent = nodes.common_ksampler(refiner_model, noise_seed + noise_offset, steps, cfg, sampler_name,
+            result_latent = nodes.common_ksampler(context, refiner_model, noise_seed + noise_offset, steps, cfg, sampler_name,
                                                   scheduler, refiner_positive, refiner_negative, base_result[0],
                                                   denoise=denoise * refiner_strength, disable_noise=False,
                                                   start_step=base_steps, last_step=steps, force_full_denoise=True)
@@ -308,6 +320,9 @@ class SeargeSDXLSampler2:
                 "noise_offset": ("INT", {"default": 1, "min": 0, "max": 1}),
                 "refiner_strength": ("FLOAT", {"default": 1.0, "min": 0.01, "max": 1.0, "step": 0.05}),
             },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
+            }
         }
 
     RETURN_TYPES = ("LATENT",)
@@ -317,7 +332,8 @@ class SeargeSDXLSampler2:
 
     def sample(self, base_model, base_positive, base_negative, refiner_model, refiner_positive, refiner_negative,
                latent_image, noise_seed, steps, cfg, sampler_name, scheduler, base_ratio, denoise,
-               refiner_prep_steps=None, noise_offset=None, refiner_strength=None):
+               refiner_prep_steps=None, noise_offset=None, refiner_strength=None,
+               context: execution_context.ExecutionContext = None):
 
         base_steps = int(steps * (base_ratio + 0.0001))
 
@@ -342,7 +358,7 @@ class SeargeSDXLSampler2:
 
             if refiner_prep_steps > 0:
                 start_at_step = refiner_prep_steps
-                precondition_result = nodes.common_ksampler(refiner_model, noise_seed + 2, steps, cfg, sampler_name,
+                precondition_result = nodes.common_ksampler(context, refiner_model, noise_seed + 2, steps, cfg, sampler_name,
                                                             scheduler, refiner_positive, refiner_negative,
                                                             latent_image, denoise=denoise, disable_noise=False,
                                                             start_step=steps - refiner_prep_steps, last_step=steps,
@@ -351,15 +367,15 @@ class SeargeSDXLSampler2:
                 input_latent = precondition_result[0]
 
         if base_steps >= steps:
-            return nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
+            return nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
                                          base_negative, input_latent, denoise=denoise, disable_noise=False,
                                          start_step=start_at_step, last_step=steps, force_full_denoise=True)
 
-        base_result = nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
+        base_result = nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler, base_positive,
                                             base_negative, input_latent, denoise=denoise, disable_noise=False,
                                             start_step=start_at_step, last_step=base_steps, force_full_denoise=True)
 
-        return nodes.common_ksampler(refiner_model, noise_seed + noise_offset, steps, cfg, sampler_name, scheduler,
+        return nodes.common_ksampler(context, refiner_model, noise_seed + noise_offset, steps, cfg, sampler_name, scheduler,
                                      refiner_positive, refiner_negative, base_result[0],
                                      denoise=denoise * refiner_strength, disable_noise=False, start_step=base_steps,
                                      last_step=steps, force_full_denoise=True)
@@ -397,6 +413,9 @@ class SeargeSDXLImage2ImageSampler2:
                 "refiner_strength": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 1.0, "step": 0.05}),
                 "softness": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.05}),
             },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
+            }
         }
 
     RETURN_TYPES = ("IMAGE",)
@@ -406,7 +425,8 @@ class SeargeSDXLImage2ImageSampler2:
 
     def sample(self, base_model, base_positive, base_negative, refiner_model, refiner_positive, refiner_negative,
                image, vae, noise_seed, steps, cfg, sampler_name, scheduler, base_ratio, denoise, softness,
-               upscale_model=None, scaled_width=None, scaled_height=None, noise_offset=None, refiner_strength=None):
+               upscale_model=None, scaled_width=None, scaled_height=None, noise_offset=None, refiner_strength=None,
+               context: execution_context.ExecutionContext=None):
 
         base_steps = int(steps * (base_ratio + 0.0001))
 
@@ -453,17 +473,17 @@ class SeargeSDXLImage2ImageSampler2:
         input_latent = vae_encode_result[0]
 
         if base_steps >= steps:
-            result_latent = nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler,
+            result_latent = nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler,
                                                   base_positive, base_negative, input_latent, denoise=denoise,
                                                   disable_noise=False, start_step=0, last_step=steps,
                                                   force_full_denoise=True)
         else:
-            base_result = nodes.common_ksampler(base_model, noise_seed, steps, cfg, sampler_name, scheduler,
+            base_result = nodes.common_ksampler(context, base_model, noise_seed, steps, cfg, sampler_name, scheduler,
                                                 base_positive, base_negative, input_latent, denoise=denoise,
                                                 disable_noise=False, start_step=0, last_step=base_steps,
                                                 force_full_denoise=True)
 
-            result_latent = nodes.common_ksampler(refiner_model, noise_seed + noise_offset, steps, cfg, sampler_name,
+            result_latent = nodes.common_ksampler(context, refiner_model, noise_seed + noise_offset, steps, cfg, sampler_name,
                                                   scheduler, refiner_positive, refiner_negative, base_result[0],
                                                   denoise=denoise * refiner_strength, disable_noise=False,
                                                   start_step=base_steps, last_step=steps, force_full_denoise=True)

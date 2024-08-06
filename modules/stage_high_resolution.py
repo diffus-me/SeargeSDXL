@@ -119,7 +119,7 @@ class SeargeStageHighResolution:
 
         def run_sampler(latent, refiner_model, steps, denoise, cfg_method, dynamic_cfg, detail_boost):
             sampler = NodeWrapper.sdxl_sampler
-            latent = sampler(base_model, base_positive, base_negative, latent, seed, steps, cfg,
+            latent = sampler(context, base_model, base_positive, base_negative, latent, seed, steps, cfg,
                              sampler_name, scheduler, refiner_model=refiner_model,
                              refiner_positive=refiner_positive, refiner_negative=refiner_negative,
                              base_ratio=base_ratio, denoise=denoise, cfg_method=cfg_method,

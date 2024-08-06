@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from .custom_sdxl_ksampler import sdxl_ksampler
 from .data_utils import retrieve_parameter
 from .names import Names
@@ -46,6 +46,9 @@ class SeargeSDXLSamplerV4:
                 "data": ("SRG_DATA_STREAM",),
                 "sampler_input": ("SRG_DATA_STREAM",),
             },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
+            }
         }
 
     RETURN_TYPES = ("SRG_DATA_STREAM", "SRG_DATA_STREAM",)
@@ -54,7 +57,7 @@ class SeargeSDXLSamplerV4:
 
     CATEGORY = UI.CATEGORY_SAMPLING
 
-    def sample(self, data=None, sampler_input=None):
+    def sample(self, data=None, sampler_input=None, context: execution_context.ExecutionContext = None):
         if data is None:
             data = {}
 
@@ -95,12 +98,12 @@ class SeargeSDXLSamplerV4:
             return (data,)
 
         if refiner_steps == 0 or not has_refiner_model:
-            result = sdxl_ksampler(base_model, None, noise_seed, base_steps, 0, cfg, sampler_name,
+            result = sdxl_ksampler(context, base_model, None, noise_seed, base_steps, 0, cfg, sampler_name,
                                    scheduler, base_positive, base_negative, None, None,
                                    latent_image, denoise=denoise, disable_noise=False, start_step=0, last_step=steps,
                                    force_full_denoise=True, dynamic_base_cfg=dynamic_base_cfg, cfg_method=cfg_method)
         else:
-            result = sdxl_ksampler(base_model, refiner_model, noise_seed, base_steps, refiner_steps, cfg, sampler_name,
+            result = sdxl_ksampler(context, base_model, refiner_model, noise_seed, base_steps, refiner_steps, cfg, sampler_name,
                                    scheduler, base_positive, base_negative, refiner_positive, refiner_negative,
                                    latent_image, denoise=denoise, disable_noise=False,
                                    start_step=0, last_step=steps, force_full_denoise=True,

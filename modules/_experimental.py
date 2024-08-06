@@ -29,6 +29,7 @@ SOFTWARE.
 import torch
 
 import comfy
+import execution_context
 
 from nodes import common_ksampler
 
@@ -53,6 +54,9 @@ class SeargeSamplerAdvanced:
                 "scale_factor": ("FLOAT", {"default": 1.5, "min": 1.0, "max": 2.0, "step": 0.5}),
                 "scale_denoise": ("FLOAT", {"default": 0.75, "min": 0.05, "max": 1.0, "step": 0.05}),
                 "scale_method": (s.UPSCALE_METHODS,),
+            },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
             }
         }
 
@@ -63,16 +67,17 @@ class SeargeSamplerAdvanced:
     CATEGORY = "Searge/_deprecated_/_test_"
 
     def sample(self, model, noise_seed, steps, cfg, sampler_name, scheduler, positive, negative, latent_image,
-               denoise, scale_factor, scale_denoise, scale_method):
+               denoise, scale_factor, scale_denoise, scale_method,
+               context: execution_context.ExecutionContext):
 
         if scale_factor < 1.001:
-            return common_ksampler(model, noise_seed, steps, cfg, sampler_name, scheduler, positive, negative,
+            return common_ksampler(context, model, noise_seed, steps, cfg, sampler_name, scheduler, positive, negative,
                                    latent_image, denoise=denoise, disable_noise=False, start_step=0,
                                    last_step=steps, force_full_denoise=True)
 
         total_steps = int(steps * (scale_factor + 0.001))
 
-        result = common_ksampler(model, noise_seed, steps, cfg, sampler_name, scheduler, positive, negative,
+        result = common_ksampler(context, model, noise_seed, steps, cfg, sampler_name, scheduler, positive, negative,
                                  latent_image, denoise=denoise, disable_noise=False, start_step=0,
                                  last_step=steps, force_full_denoise=True)
 
@@ -106,7 +111,7 @@ class SeargeSamplerAdvanced:
 
             samples = s
 
-            result = common_ksampler(model, noise_seed, restore_steps, cfg, sampler_name, scheduler, positive,
+            result = common_ksampler(context, model, noise_seed, restore_steps, cfg, sampler_name, scheduler, positive,
                                      negative, samples, denoise=scale_denoise, disable_noise=False, start_step=0,
                                      last_step=restore_steps, force_full_denoise=True)
 

@@ -306,7 +306,7 @@ def sdxl_sample(base_model, refiner_model, noise, base_steps, refiner_steps, cfg
 
 # --------------------------------------------------------------------------------
 
-def sdxl_ksampler(base_model, refiner_model, seed, base_steps, refiner_steps, cfg, sampler_name, scheduler,
+def sdxl_ksampler(context, base_model, refiner_model, seed, base_steps, refiner_steps, cfg, sampler_name, scheduler,
                   base_positive, base_negative, refiner_positive, refiner_negative, latent, denoise=1.0,
                   disable_noise=False, start_step=None, last_step=None, force_full_denoise=False, cfg_method=None,
                   dynamic_base_cfg=0.0, dynamic_refiner_cfg=0.0, refiner_detail_boost=0.0):
@@ -328,10 +328,10 @@ def sdxl_ksampler(base_model, refiner_model, seed, base_steps, refiner_steps, cf
     if preview_format not in ["JPEG", "PNG"]:
         preview_format = "JPEG"
 
-    base_previewer = latent_preview.get_previewer(device, base_model.model.latent_format)
+    base_previewer = latent_preview.get_previewer(context, device, base_model.model.latent_format)
     refiner_previewer = None
     if refiner_model is not None:
-        refiner_previewer = latent_preview.get_previewer(device, refiner_model.model.latent_format)
+        refiner_previewer = latent_preview.get_previewer(context, device, refiner_model.model.latent_format)
 
     steps = base_steps + refiner_steps
     pbar = comfy.utils.ProgressBar(steps)
