@@ -271,7 +271,7 @@ class SeargeStageLoadCheckpoints:
             clipvision_name = access.get_active_setting(UI.S_CONTROLNET_MODELS, UI.F_CLIP_VISION_CHECKPOINT, UI.NONE)
 
             if clipvision_name != UI.NONE and folder_paths.get_full_path(context, "clip_vision", clipvision_name) is not None:
-                clip_vision_model = NodeWrapper.clipvision_loader.load_clip(clipvision_name)[0]
+                clip_vision_model = NodeWrapper.clipvision_loader.load_clip(clipvision_name, context)[0]
             else:
                 clip_vision_model = None
 
