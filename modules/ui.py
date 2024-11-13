@@ -168,15 +168,12 @@ class UI:
     SAVE_DISABLED = "none - don't save"
     SAVE_TO_OUTPUT = "output"
     SAVE_TO_OUTPUT_DATE = "output/%date%"
-    SAVE_TO_OUTPUT_SEARGE_SDXL_DATE = "output/Searge-SDXL-%date%"
+    SAVE_TO_OUTPUT_SEARGE_SDXL_DATE = "output/%date%"
     SAVE_TO_INPUT = "input"
 
     SAVE_FOLDERS = [
         SAVE_DISABLED,
-        SAVE_TO_OUTPUT,
         SAVE_TO_OUTPUT_DATE,
-        SAVE_TO_OUTPUT_SEARGE_SDXL_DATE,
-        SAVE_TO_INPUT,
     ]
 
     CFG_INTERPOLATE = CfgMethods.INTERPOLATE

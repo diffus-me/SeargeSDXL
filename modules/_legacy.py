@@ -701,7 +701,7 @@ class SeargeStylePreprocessor:
 
     CATEGORY = "Searge/_deprecated_/UI"
 
-    def process(self, context: execution_context.ExecutionContext, inputs, active_style_name, style_definitions):
+    def process(self, inputs, active_style_name, style_definitions, context: execution_context.ExecutionContext):
         if inputs is None:
             inputs = {}
 
@@ -1850,6 +1850,9 @@ class SeargeCheckpointLoader:
         return {"required": {
             "ckpt_name": ("CHECKPOINT_NAME",),
         },
+        "hidden": {
+            "context": "EXECUTION_CONTEXT"
+        }
         }
 
     RETURN_TYPES = ("MODEL", "CLIP", "VAE",)
@@ -1857,8 +1860,8 @@ class SeargeCheckpointLoader:
 
     CATEGORY = "Searge/_deprecated_/Files"
 
-    def load_checkpoint(self, ckpt_name):
-        return self.chkp_loader.load_checkpoint(ckpt_name)
+    def load_checkpoint(self, ckpt_name, context: execution_context.ExecutionContext):
+        return self.chkp_loader.load_checkpoint(ckpt_name, context)
 
 
 # ====================================================================================================
@@ -1874,6 +1877,9 @@ class SeargeVAELoader:
         return {"required": {
             "vae_name": ("VAE_NAME",),
         },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT"
+            }
         }
 
     RETURN_TYPES = ("VAE",)
@@ -1881,8 +1887,8 @@ class SeargeVAELoader:
 
     CATEGORY = "Searge/_deprecated_/Files"
 
-    def load_vae(self, vae_name):
-        return self.vae_loader.load_vae(vae_name)
+    def load_vae(self, vae_name, context: execution_context.ExecutionContext):
+        return self.vae_loader.load_vae(vae_name, context)
 
 
 # ====================================================================================================
@@ -1897,7 +1903,9 @@ class SeargeUpscaleModelLoader:
     def INPUT_TYPES(s):
         return {"required": {
             "upscaler_name": ("UPSCALER_NAME",),
-        },
+        },"hidden": {
+            "context": "EXECUTION_CONTEXT"
+        }
         }
 
     RETURN_TYPES = ("UPSCALE_MODEL",)
@@ -1905,8 +1913,8 @@ class SeargeUpscaleModelLoader:
 
     CATEGORY = "Searge/_deprecated_/Files"
 
-    def load_upscaler(self, upscaler_name):
-        return self.upscale_model_loader.load_model(upscaler_name)
+    def load_upscaler(self, upscaler_name, context: execution_context.ExecutionContext):
+        return self.upscale_model_loader.load_model(upscaler_name, context=context)
 
 
 # ====================================================================================================
@@ -1926,6 +1934,9 @@ class SeargeLoraLoader:
             "strength_model": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
             "strength_clip": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
         },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT",
+            }
         }
 
     RETURN_TYPES = ("MODEL", "CLIP",)
@@ -1933,8 +1944,8 @@ class SeargeLoraLoader:
 
     CATEGORY = "Searge/_deprecated_/Files"
 
-    def load_lora(self, model, clip, lora_name, strength_model, strength_clip):
-        return self.lora_loader.load_lora(model, clip, lora_name, strength_model, strength_clip)
+    def load_lora(self, model, clip, lora_name, strength_model, strength_clip, context: execution_context.ExecutionContext=None):
+        return self.lora_loader.load_lora(model, clip, lora_name, strength_model, strength_clip, context=context)
 
 
 # ====================================================================================================

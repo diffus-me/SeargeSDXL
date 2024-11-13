@@ -75,13 +75,15 @@ class SeargeStageApplyLoras:
             for lora in lora_stack:
                 lora_name = retrieve_parameter(UI.F_LORA_NAME, lora)
                 lora_strength = retrieve_parameter(UI.F_LORA_STRENGTH, lora, 0.0)
+                if not lora_name or lora_name == UI.NONE or lora_strength == 0.0:
+                    continue
 
                 if folder_paths.get_full_path(context, "loras", lora_name) is None or base_model is None or base_clip is None:
                     lora_name = None
 
                 if lora_name is not None and lora_name != UI.NONE and lora_strength != 0.0:
                     (base_model, base_clip) = NodeWrapper.lora_loader.load_lora(base_model, base_clip, lora_name,
-                                                                                lora_strength, lora_strength)
+                                                                                lora_strength, lora_strength, context=context)
                     applied_loras.append(lora_name)
 
             access.update_in_cache(Names.C_APPLIED_LORAS, lora_stack, (base_model, base_clip))

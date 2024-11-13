@@ -28,6 +28,7 @@ SOFTWARE.
 
 import random
 
+import execution_context
 import folder_paths
 import nodes
 
@@ -56,7 +57,7 @@ class SeargePreviewImage(nodes.SaveImage):
             "hidden": {
                 "prompt": "PROMPT",
                 "extra_pnginfo": "EXTRA_PNGINFO",
-                "user_hash": "USER_HASH"
+                "context": "EXECUTION_CONTEXT",
             },
         }
 
@@ -66,14 +67,14 @@ class SeargePreviewImage(nodes.SaveImage):
 
     CATEGORY = UI.CATEGORY_UI
 
-    def preview_images(self, enabled, images=None, prompt=None, extra_pnginfo=None, user_hash=''):
+    def preview_images(self, enabled, images=None, prompt=None, extra_pnginfo=None, context: execution_context.ExecutionContext=None):
         if images is None or not enabled:
             return {
                 "result": (images,),
                 "ui": {"images": list(), },
             }
 
-        saved_images = nodes.SaveImage.save_images(self, images, "srg_sdxl_preview", prompt, extra_pnginfo, user_hash)
+        saved_images = nodes.SaveImage.save_images(self, images, "srg_sdxl_preview", prompt, extra_pnginfo, context=context)
         saved_images["result"] = (images,)
 
         return saved_images

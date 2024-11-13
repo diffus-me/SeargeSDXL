@@ -102,3 +102,13 @@ class SeargeImageSaving:
         )
 
         return (data,)
+
+    @classmethod
+    def VALIDATE_INPUTS(self, save_parameters_file, save_folder,
+            save_generated_image, embed_workflow_in_generated, generated_image_name,
+            save_high_res_image, embed_workflow_in_high_res, high_res_image_name,
+            save_upscaled_image, embed_workflow_in_upscaled, upscaled_image_name, data=None):
+        if save_folder not in UI.SAVE_FOLDERS:
+            return f"'{save_folder}' is not a valid save folder of '{UI.SAVE_FOLDERS}'"
+
+        return True

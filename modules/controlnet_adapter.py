@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-
+import execution_context
 from folder_paths import get_full_path
 
 from .controlnet import canny
@@ -47,8 +47,8 @@ class SeargeControlnetAdapterV2:
         self.hed_annotator = "ControlNetHED.pth"
         self.leres_annotator = "res101.pth"
 
-        self.hed_annotator_full_path = get_full_path(None, "annotators", self.hed_annotator)
-        self.leres_annotator_full_path = get_full_path(None, "annotators", self.leres_annotator)
+        # self.hed_annotator_full_path = get_full_path(None, "annotators", self.hed_annotator)
+        # self.leres_annotator_full_path = get_full_path(None, "annotators", self.leres_annotator)
 
     @classmethod
     def INPUT_TYPES(s):
@@ -68,6 +68,9 @@ class SeargeControlnetAdapterV2:
                 "data": ("SRG_DATA_STREAM",),
                 "source_image": ("IMAGE",),
             },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT",
+            }
         }
 
     RETURN_TYPES = ("SRG_DATA_STREAM", "IMAGE",)
@@ -76,15 +79,17 @@ class SeargeControlnetAdapterV2:
 
     CATEGORY = UI.CATEGORY_UI_PROMPTING
 
-    def process_image(self, image, mode, low_threshold, high_threshold):
+    def process_image(self, image, mode, low_threshold, high_threshold, context: execution_context.ExecutionContext):
         if mode == UI.CN_MODE_CANNY:
             image = canny(image, low_threshold, high_threshold)
 
         elif mode == UI.CN_MODE_DEPTH:
-            image = leres(image, low_threshold, high_threshold, self.leres_annotator_full_path)
+            leres_annotator_full_path = get_full_path(context, "annotators", self.leres_annotator)
+            image = leres(image, low_threshold, high_threshold, leres_annotator_full_path)
 
         elif mode == UI.CN_MODE_SKETCH:
-            image = hed(image, self.hed_annotator_full_path)
+            hed_annotator_full_path = get_full_path(context, "annotators", self.hed_annotator)
+            image = hed(image, hed_annotator_full_path)
 
         else:
             # do nothing for any other mode, just use the provided image unchanged
@@ -93,7 +98,8 @@ class SeargeControlnetAdapterV2:
         return image
 
     def create_dict(self, stack, source_image, controlnet_mode, controlnet_preprocessor, strength,
-                    low_threshold, high_threshold, start, end, noise_augmentation, revision_enhancer):
+                    low_threshold, high_threshold, start, end, noise_augmentation, revision_enhancer,
+                    context: execution_context.ExecutionContext):
         if controlnet_mode is None or controlnet_mode == UI.NONE:
             cn_image = None
         else:
@@ -107,7 +113,7 @@ class SeargeControlnetAdapterV2:
             controlnet_preprocessor = False
 
         if controlnet_preprocessor and cn_image is not None:
-            cn_image = self.process_image(cn_image, controlnet_mode, low_threshold, high_threshold)
+            cn_image = self.process_image(cn_image, controlnet_mode, low_threshold, high_threshold, context)
 
         stack += [
             {
@@ -133,7 +139,8 @@ class SeargeControlnetAdapterV2:
         )
 
     def get_value(self, controlnet_mode, controlnet_preprocessor, strength, low_threshold, high_threshold,
-                  start_percent, end_percent, noise_augmentation, revision_enhancer, source_image=None, data=None):
+                  start_percent, end_percent, noise_augmentation, revision_enhancer, source_image=None, data=None,
+                  context: execution_context.ExecutionContext=None):
         if data is None:
             data = {}
 
@@ -158,6 +165,7 @@ class SeargeControlnetAdapterV2:
             end_percent,
             noise_augmentation,
             revision_enhancer,
+            context=context
         )
 
         data[UI.S_CONTROLNET_INPUTS] = stack_entry

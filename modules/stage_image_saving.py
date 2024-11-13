@@ -60,7 +60,7 @@ class SeargeStageImageSaving:
 
         return stage_data
 
-    def process(self, context: execution_context.ExecutionContext, data, stage_input, user_hash):
+    def process(self, context: execution_context.ExecutionContext, data, stage_input):
         access = PipelineAccess(stage_input)
 
         save_parameters_file = access.get_active_setting(UI.S_IMAGE_SAVING, UI.F_SAVE_PARAMETERS_FILE, False)
@@ -97,7 +97,7 @@ class SeargeStageImageSaving:
         seed = access.get_active_setting(UI.S_GENERATION_PARAMETERS, UI.F_SEED)
 
         save_to_input = save_folder == UI.SAVE_TO_INPUT
-        output_folder = folder_paths.get_input_directory(user_hash) if save_to_input else folder_paths.get_output_directory(user_hash)
+        output_folder = folder_paths.get_input_directory(context.user_hash) if save_to_input else folder_paths.get_output_directory(context.user_hash)
 
         if save_folder == UI.SAVE_TO_OUTPUT:
             sub_folder = ""
@@ -151,7 +151,7 @@ class SeargeStageImageSaving:
             images_to_save = generated_images if post_processed_images is None else post_processed_images
             self.save_images(images_to_save, full_path, filename, embed_wf_in_generated,
                              hidden_prompt, hidden_extra_pnginfo,
-                             user_hash)
+                             user_hash=context.user_hash)
 
             anything_saved = True
 
@@ -163,7 +163,7 @@ class SeargeStageImageSaving:
             images_to_save = high_res_images if post_processed_hires is None else post_processed_hires
             self.save_images(images_to_save, full_path, filename, embed_wf_in_high_res,
                              hidden_prompt, hidden_extra_pnginfo,
-                             user_hash)
+                             user_hash=context.user_hash)
 
             anything_saved = True
 
@@ -174,7 +174,7 @@ class SeargeStageImageSaving:
             upscaled_image_path = os.path.join(sub_folder, filename)
             self.save_images(upscaled_images, full_path, filename, embed_wf_in_upscaled,
                              hidden_prompt, hidden_extra_pnginfo,
-                             user_hash)
+                             user_hash=context.user_hash)
 
             anything_saved = True
 
