@@ -1926,6 +1926,9 @@ class SeargeLoraLoader:
             "strength_model": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
             "strength_clip": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
         },
+            "hidden": {
+                "context": "EXECUTION_CONTEXT",
+            }
         }
 
     RETURN_TYPES = ("MODEL", "CLIP",)
@@ -1933,8 +1936,8 @@ class SeargeLoraLoader:
 
     CATEGORY = "Searge/_deprecated_/Files"
 
-    def load_lora(self, model, clip, lora_name, strength_model, strength_clip):
-        return self.lora_loader.load_lora(model, clip, lora_name, strength_model, strength_clip)
+    def load_lora(self, model, clip, lora_name, strength_model, strength_clip, context: execution_context.ExecutionContext=None):
+        return self.lora_loader.load_lora(model, clip, lora_name, strength_model, strength_clip, context=context)
 
 
 # ====================================================================================================

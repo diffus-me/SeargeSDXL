@@ -26,6 +26,7 @@ SOFTWARE.
 
 """
 import execution_context
+from .data_utils import retrieve_parameter
 from .mb_pipeline import PipelineAccess
 from .stage import SeargeStage
 from .stage_pre_processing import SeargePreProcessData
@@ -138,6 +139,23 @@ class SeargeMagicBox:
     FUNCTION = "process"
 
     CATEGORY = UI.CATEGORY_MAGIC
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, stage, data, stage_input=None, context: execution_context.ExecutionContext = None):
+        access = PipelineAccess(stage_input)
+        if stage == cls.NONE:
+            pass
+        elif stage == cls.LOAD_CHECKPOINTS:
+            base_name = access.get_active_setting(UI.S_CHECKPOINTS, UI.F_BASE_CHECKPOINT)
+            context.validate_model("checkpoints", base_name)
+            refiner_name = access.get_active_setting(UI.S_CHECKPOINTS, UI.F_REFINER_CHECKPOINT, UI.NONE)
+            context.validate_model("checkpoints", refiner_name)
+        elif stage == cls.APPLY_LORAS:
+            lora_stack = access.get_active_setting(UI.S_LORAS, UI.F_LORA_STACK, [])
+            for lora in lora_stack:
+                lora_name = retrieve_parameter(UI.F_LORA_NAME, lora)
+                context.validate_model("loras", lora_name)
+        return True
 
     def run_stage(self, stage, data, stage_input=None, context: execution_context.ExecutionContext = None):
         stage_processor = None
